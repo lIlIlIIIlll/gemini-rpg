@@ -17,24 +17,20 @@ export class SemanticSearch {
 
     async generateQueryEmbedding(text) {
         try {
-            // CORREÇÃO FINAL: Usando a estrutura de payload exata do seu código original.
-            // A API espera um array de strings simples para o modelo de embedding.
             const result = await this.genAI.models.embedContent({
                 model: "gemini-embedding-001",
-                contents: [text], // O texto é simplesmente envolvido em um array.
-                taskType: 'RETRIEVAL_QUERY',
+                contents: [
+                    { parts: [{ text: String(text) }] }
+                ],
+                taskType: "RETRIEVAL_QUERY",
+                outputDimensionality: 768 // opcional
             });
 
-            // CORREÇÃO: Reimplementando a lógica de verificação dupla do seu código original,
-            // que lida tanto com respostas de item único (`embedding`) quanto de lote (`embeddings`).
             if (result.embedding) {
                 return result.embedding.values;
-            }
-            else if (result.embeddings && result.embeddings.length > 0) {
+            } else if (result.embeddings && result.embeddings.length > 0) {
                 return result.embeddings[0].values;
-            }
-            else {
-                // Se nenhuma das propriedades for encontrada, o erro é lançado.
+            } else {
                 throw new Error("Nenhum embedding retornado pela API para a consulta.");
             }
         } catch (error) {
@@ -45,20 +41,20 @@ export class SemanticSearch {
 
     async generateDocumentEmbedding(text) {
         try {
-            // CORREÇÃO: Aplicando a mesma estrutura de payload e lógica de verificação aqui.
             const result = await this.genAI.models.embedContent({
                 model: "gemini-embedding-001",
-                contents: [text], // O texto é simplesmente envolvido em um array.
-                taskType: 'RETRIEVAL_DOCUMENT',
+                contents: [
+                    { parts: [{ text: String(text) }] }
+                ],
+                taskType: "RETRIEVAL_DOCUMENT",
+                outputDimensionality: 768 // opcional
             });
 
             if (result.embedding) {
                 return result.embedding.values;
-            }
-            else if (result.embeddings && result.embeddings.length > 0) {
+            } else if (result.embeddings && result.embeddings.length > 0) {
                 return result.embeddings[0].values;
-            }
-            else {
+            } else {
                 throw new Error("Nenhum embedding retornado pela API para o documento.");
             }
         } catch (error) {
